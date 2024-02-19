@@ -18,11 +18,11 @@ const Login = () => {
        await axios.post("http://127.0.0.1:8000/UserCheck/",Data).then((d)=>{
           console.log(d.data)
           if(d.data.Message){
-           navigate('/Dash')
+             navigate('/Dash')
             
           }
           else{
-            Value=false
+            alert('password/email are not matched')
           }
         }).catch((e)=>{
           // console.log('error')  

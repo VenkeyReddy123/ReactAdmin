@@ -35,10 +35,11 @@ function App() {
  {/* <AddProducts/> */}
        <BrowserRouter>
                 <Routes>
-                       <Route path='/' element={<Login/>}></Route>
+                       {/* <Route path='/' element={<Login/>}></Route> */}
+                       <Route path='/Reg' element={<UserReg/>}/>
                        <Route path='/Edit' element={<ModifyFIle/>}/>
                        <Route path='/Delete' element={<Delete/>}/>
-                       <Route path='/Dash' element={<DashBoard/>}/>
+                       <Route path='/' element={<DashBoard/>}/>
                 </Routes>
        </BrowserRouter>
 {/* <Modify/> */}

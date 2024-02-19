@@ -53,15 +53,18 @@ const UserReg = () => {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+               
             })
                 .then(response => {
                     console.log('Response:', response);
+                    navigate('/')
                     // Handle successful response
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     // Handle error
                 });
+                
         } else {
             alert('Passwords do not match');
         }
@@ -75,7 +78,7 @@ const UserReg = () => {
   <form method="POST" onSubmit={(e)=>{e.preventDefault()
    HanleSubmit()
    console.log('hii')
-   navigate('/')
+  
   }} className='form-group shadow mt-5' style={{ background: '#EDE7C7', borderRadius: '50px', maxWidth: '400px', width: '90%' }} enctype="multipart/form-data">
 
     <div className='mt-3 mx-3'>
