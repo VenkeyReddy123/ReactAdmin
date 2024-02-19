@@ -1,7 +1,9 @@
 import axios from 'axios'
 import React,{useRef} from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const UserReg = () => {
+  const navigate=useNavigate()
     const Uname=useRef(null)
     const Fname = useRef(null)
     const Lname = useRef(null)
@@ -11,9 +13,8 @@ const UserReg = () => {
     const RPass = useRef(null)
     const IRef=useRef(null)
 
-    function HanleSubmit(e) {
-        console.log('hii')
-        e.preventDefault();
+    function HanleSubmit() {
+      console.log('bye')
         const uname = Uname.current.value;
         const fname = Fname.current.value;
         const lname = Lname.current.value;
@@ -71,7 +72,11 @@ const UserReg = () => {
     <>
    <div className='container-fluid' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
   <h1 className='mt-3 text-warning'> <i className="fa-solid fa-user text-danger mr-2 rounded-circle"></i>User Registration</h1>
-  <form method="POST" onSubmit={HanleSubmit} className='form-group shadow mt-5' style={{ background: '#EDE7C7', borderRadius: '50px', maxWidth: '400px', width: '90%' }} enctype="multipart/form-data">
+  <form method="POST" onSubmit={(e)=>{e.preventDefault()
+   HanleSubmit()
+   console.log('hii')
+   navigate('/')
+  }} className='form-group shadow mt-5' style={{ background: '#EDE7C7', borderRadius: '50px', maxWidth: '400px', width: '90%' }} enctype="multipart/form-data">
 
     <div className='mt-3 mx-3'>
       <label htmlFor="fn" className='form-label'>UserName <span style={{ color: 'red' }}>*</span></label>
