@@ -11,38 +11,35 @@ import UserReg from './UserReg'
 import Modify from './Components/Modify';
 import ModifyFIle from './Components/ModifyFIle';
 import Delete from './Components/DasBoard/Delete';
+import CustemorDetail from './Components/CustemorDetail';
+import Orders from './Components/Orders';
+import CuponCode from './CuponCode';
+import Forget from './Forget';
+// import ModelCheck from './ModelCheck'
+
 function App() {
+       const request=(localStorage.getItem('username')?true:false)    
   return (
     
    <>
-{/* <Modify/> */}
- 
- 
- {/* <UserReg></UserReg> */}
- 
- {/* <AdminPage/> */}
- 
- 
- {/* <Sidebar/> */}
- {/* <AdminPage/> */}
- {/* <DashBoard></DashBoard> */}
 
-  
-{/* <TodayOrders/> */}
-
-
- {/* <Login></Login> */}
- {/* <AddProducts/> */}
        <BrowserRouter>
                 <Routes>
-                       {/* <Route path='/' element={<Login/>}></Route> */}
+                       {request?<Route path='/' element={<DashBoard/>}/>:<Route path='/' element={<Login/>}></Route>}
                        <Route path='/Reg' element={<UserReg/>}/>
-                       <Route path='/Edit' element={<ModifyFIle/>}/>
+                       <Route path='/Mod' element={<Modify/>}/>
                        <Route path='/Delete' element={<Delete/>}/>
-                       <Route path='/' element={<DashBoard/>}/>
+                       <Route path='/Das' element={<DashBoard/>}/>
+                       <Route path='/Add' element={<AddProducts/>}/>
+                       <Route path='/Cust' element={<CustemorDetail/>}/>
+                       <Route path='/Ord' element={<Orders/>}/>
+                       <Route path='Cupon' element={<CuponCode/>}/>
+                       <Route path='/For' element={<Forget/>}/>
+                       
                 </Routes>
        </BrowserRouter>
 {/* <Modify/> */}
+{/* <TaskModal/> */}
 {/* <ModifyFIle/> */}
    
    </>

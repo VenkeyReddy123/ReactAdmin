@@ -1,0 +1,8 @@
+
+.progress-translate {
+    transition: transform 0.5s ease-in-out;
+}
+
+.progress-translate:hover {
+    transform: translateX(100px); /* Adjust the value as per your preference */
+}

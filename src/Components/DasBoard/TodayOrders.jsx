@@ -1,9 +1,81 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Details } from './RiviewDetails'
+import axios from 'axios'
 
 const TodayOrders = () => {
     const Data=Details
     const Time=['10Min Ago','35Min Ago','55Min Ago','1Hour Ago','4Hours Ago','5Hours Ago']
+    const [pw,setpw]=useState('')
+    const[rpw,setrpw]=useState('')
+    const [un,setun]=useState('')
+    const[run,setrun]=useState('')
+    const[Con1,setCon]=useState(false)
+    const[Con2,setCon2]=useState(false)
+    const Condition1=(val)=>{
+    
+      if(val==='User'){
+        setCon2(!Con2)
+      }
+      else{
+        setCon(!Con1)
+      }
+    }
+    const Condition3=()=>{
+      setCon(!Con1)
+    }
+    const Condition2=()=>{
+      setCon2(!Con2)
+    }
+    
+    const HandleUsername=(e)=>{
+      e.preventDefault()
+      if(un.length>1){
+        if(un===run){
+          const Data={
+            'pk':Number(localStorage.getItem('id')),
+            'password':localStorage.getItem('Password'),
+            'username':un
+          }
+          console.log(Data)
+         
+  
+          axios.patch("http://127.0.0.1:8000/UserDetails/",Data).then((d)=>{
+              alert("Username Changed Sucessfully")
+          }).catch((e)=>{
+            alert('Please Try Again LAter ')
+          })
+      }
+      else{
+        alert('Password are not matched')
+      }
+      }
+      Condition2()
+      
+       
+    }
+    
+    const HandlePassword=(e)=>{
+      e.preventDefault()
+      if(pw.length>1){
+        if(pw===rpw){
+          const Data={
+            'pk':Number(localStorage.getItem('id')),
+            'password':pw
+          }
+          axios.patch("http://127.0.0.1:8000/UserDetails/",Data).then((d)=>{
+              alert("Password CHanged Sucessfully")
+          }).catch((e)=>{
+            alert('Please Try Again LAter ')
+          })
+      }
+      else{
+        alert('Password are not matched')
+      }
+      }
+      Condition3()
+      
+       
+    }
   return (
     <>
       <div className='container-fluid' style={{ overflowX: 'hidden' }}>
@@ -39,6 +111,30 @@ const TodayOrders = () => {
       </table>
     </div>
   </div>
+  {Con1&&<>
+      <div className='col-sm-5   card bg-primary' style={{position:'absolute',top:'105px',right:'10px',overflow:'hidden'}}>
+          <h6 className='text-center mt-2'>Password Change</h6>
+          <form onSubmit={HandlePassword}>
+             <input type="password" onChange={(e)=>{setpw(e.target.value)}} placeholder='Enter New Password' className='form-control ml-2 mr-2 p-2 mb-2 mt-3' />
+             <input type="password" onChange={(e)=>{setrpw(e.target.value)}} placeholder='Enter  AgainNew Password' className='form-control ml-2 mr-2 mb-2' />
+            <div className='text-center mb-2'>
+               <input type="submit" value={'Change Password'} className='btn btn-warning ' />
+            </div>
+          </form>
+      </div>
+     </>}
+     {Con2&&<>
+      <div className='col-sm-5   card bg-primary' style={{position:'absolute',top:'105px',right:'10px',overflow:'hidden'}}>
+          <h6 className='text-center mt-2'>Username Change</h6>
+          <form onSubmit={HandleUsername}>
+             <input type="password" onChange={(e)=>{setun(e.target.value)}} placeholder='Enter New Username' className='form-control ml-2 mr-2 p-2 mb-2 mt-3' />
+             <input type="password" onChange={(e)=>{setrun(e.target.value)}} placeholder='Enter  AgainNew Username' className='form-control ml-2 mr-2 mb-2' />
+            <div className='text-center mb-2'>
+               <input type="submit" value={'Change Username'} className='btn btn-warning ' />
+            </div>
+          </form>
+      </div>
+     </>}
 </div>
 
     </>
