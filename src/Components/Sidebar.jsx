@@ -23,9 +23,8 @@ const Sidebar = ({Condition1}) => {
     };
   }, []);
   const HandleLogout=()=>{
-    alert('Logout')
     localStorage.removeItem('username')
-    localStorage.removeItem('id') 
+    // localStorage.removeItem('id') 
     navigate('/')
   }
 
@@ -35,7 +34,7 @@ const Sidebar = ({Condition1}) => {
       <button className="navbar-toggler ml-auto bg-dark" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span className="navbar-toggler-icon"></span>
       </button>
-
+    
       <div className="collapse navbar-collapse bg-dark" id="navbarSupportedContent">
         <ul className="navbar-nav mr-auto col-12 d-lg-flex flex-lg-row justify-content-between">
           <li className="nav-item active">

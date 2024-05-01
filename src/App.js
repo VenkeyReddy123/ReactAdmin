@@ -9,23 +9,29 @@ import Login from './Login'
 import SelectExample from './Select';
 import UserReg from './UserReg'
 import Modify from './Components/Modify';
-import ModifyFIle from './Components/ModifyFIle';
+
 import Delete from './Components/DasBoard/Delete';
 import CustemorDetail from './Components/CustemorDetail';
 import Orders from './Components/Orders';
 import CuponCode from './CuponCode';
 import Forget from './Forget';
-// import ModelCheck from './ModelCheck'
+import ImageCheck from './ImageCheck';
+import PageCheking from './PageCheking';
+import Update from './Components/Update'
+import CancelOrders from './Components/DasBoard/CancelOrders';
+
 
 function App() {
        const request=(localStorage.getItem('username')?true:false)    
+      
   return (
     
    <>
 
        <BrowserRouter>
                 <Routes>
-                       {request?<Route path='/' element={<DashBoard/>}/>:<Route path='/' element={<Login/>}></Route>}
+                       { request?<Route path='/' element={<DashBoard/>}/>:<Route path='/' element={<Login/>}></Route>}
+                       <Route path='/Login' element={<Login/>}></Route>
                        <Route path='/Reg' element={<UserReg/>}/>
                        <Route path='/Mod' element={<Modify/>}/>
                        <Route path='/Delete' element={<Delete/>}/>
@@ -33,14 +39,16 @@ function App() {
                        <Route path='/Add' element={<AddProducts/>}/>
                        <Route path='/Cust' element={<CustemorDetail/>}/>
                        <Route path='/Ord' element={<Orders/>}/>
-                       <Route path='Cupon' element={<CuponCode/>}/>
+                       <Route path='/Cupon' element={<CuponCode/>}/>
                        <Route path='/For' element={<Forget/>}/>
+                       <Route path='/Up' element={<Update/>}/>
+                     
+                       <Route path='/Can' element={<CancelOrders/>}/>
                        
                 </Routes>
-       </BrowserRouter>
-{/* <Modify/> */}
-{/* <TaskModal/> */}
-{/* <ModifyFIle/> */}
+       </BrowserRouter>            
+       <PageCheking/>
+
    
    </>
   );

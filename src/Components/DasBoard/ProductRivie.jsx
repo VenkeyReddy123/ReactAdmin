@@ -24,10 +24,11 @@ const ProductRivie = () => {
   const [Data,setData]=useState([])
   useEffect(()=>{
         axios.get("http://127.0.0.1:8000/LCODetails/").then((d)=>{
+          const TDate=new Date().toLocaleDateString()
            const filterData=d.data.filter((e)=>{
-            return e.username==Number(localStorage.getItem('id'))
+            const ODate=new Date(e.Order_Id.Date).toLocaleDateString()
+            return String(ODate)===String(TDate)&& e.Order_Id.OrderCancel=='No'
            })
-           console.log(filterData)
              setData(filterData)
              
         }).catch((e)=>{
@@ -35,48 +36,65 @@ const ProductRivie = () => {
         })
   },[])
 
-  
-
   return (
     
     <>
 
-        <div className='div ml-1' style={{}}>
-                <table className='table col-11 ml-1 mr-2 text-center' style={{textAlign:'center'}}>
-                      <tr className='text-center'>
-                        
-                          <th className='col-2'><h3>Custemers</h3></th> 
-                          <th className='col-5 '><h3>Product</h3></th> 
-                          <th className='col2'><h3>Time</h3></th>
-                          <th className='col-1'><h3>D_Type</h3></th>
-                          <th className='col-2'><h3>Status</h3></th> 
-                          
-                      </tr>
-                      {Data.map((e)=>{
-                         return(
-                          <>
-                              <tr>
-                                   <td><img src={e.ImageUrl}  width={'50px'} className='mr-3 rounded-circle' /><h6>{e.Custamer_Name.Custamer_Name}</h6></td>
-                                   
-                                   <td className='d-flex flex-row justify-content-center '><h6>{e.Product_Name.Product_Name}</h6></td>
-                                   <td><h6>{formatDate(e.Date)}</h6 ></td>
-                                   <td><span style={{}}>{e.Delivary_Type}</span ></td>
-                                   <td><span >{e.Payment_Status==='Compleate'?(<i className="fa-solid fa-check text-success mr-1"></i>):(<i className="fa-solid fa-clock text-danger mr-1"></i>)}{e.Payment_Status}</span></td>
-                              </tr>
-                          </>
-                         )
-                      })}
-                      
-                </table>
+        <div className='div ml-1'>
+          <span className='btn btn-primary p-2 mb-2'>Today Orders</span>
+        {Data&&Data.slice().reverse().slice().map(order => (
+          <div key={order.order_id} className="admin-order-row">
+            <div className="admin-order-row-scroll">
+              <table className="admin-order-table">
+                <thead>
+                  <tr>
+                    <th >Order ID</th>
+                    <th>Customer Name</th>
+                    <td>State</td>
+                    <td>City</td>
+                    <td>House</td>
+                    <td>Road</td>
+                    <th>Payment Status</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Actual_Price</th>
+                    <th>Selling_Price</th>
+                    <th>Cupon_Using</th>
+                    <th>Delivery Type</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Delivary</th>
+                  </tr>
+                </thead>
+                <tbody style={{background:'',color:''}} >
+                <tr key={order.Order_Id.Order_Id} style={{overflowx:'auto'}}>
+              <td>{order.Order_Id.Order_Id}</td>
+              <td>{order.Custamer_Name.Custamer_Name}</td>
+              <td style={{textWrap:'nowrap'}} >{JSON.parse(order.Adress).State}</td>
+              <td>{order.City}</td>
+              <td >Road:-{JSON.parse(order.Adress).Road}</td>
+              <td style={{textWrap:'wrap'}} >House:-{JSON.parse(order.Adress).House}</td>
+             
+              <td  style={{textWrap:'nowrap'}}>{order.Order_Id.Payment_Status==='Compleate'?<><span className='bg-success btn p-1' style={{height:'max-content',fontWeight:'bold'}}>{order.Order_Id.Payment_Status}</span></>:<><span className='bg-danger btn  p-1' style={{height:'max-content',fontWeight:'bold'}}>{order.Order_Id.Payment_Status}</span><span><i class="fa-solid fa-check ml-2 text-dark btn btn-primary p-1"></i></span></>}</td>
+              <td style={{fontSize:'15px',}}><span>{order.Order_Id.Product_Name.Product_Name}</span></td>
+              <td style={{fontSize:'15px',}}><span>{order.Quantity}</span></td>
+              <td style={{fontSize:'15px',}}><span>{order.Order_Id.Product_Name.Price}</span></td>
+              <td style={{textWrap:'nowrap'}}>{order.Order_Id.Selling_Price}</td> 
+              <td style={{textWrap:'nowrap'}}>{order.Order_Id.Code_Using==0?<>No</>:<>{order.Order_Id.Code_Using}</>}</td> 
+
+              <td style={{textWrap:'nowrap'}}>{order.Order_Id.Delivary_Type}</td> 
+              <td style={{textWrap:'nowrap'}}>{new Date(order.Order_Id.Date).toLocaleDateString()}</td>
+               <td style={{textWrap:'nowrap'}}>{ new Date(order.Order_Id.Date).toLocaleTimeString()}</td>
+               <td style={{textWrap:'nowrap'}}>{order.Order_Id.Delivary=='No'?<><span className='bg-danger btn p-1' >{order.Order_Id.Delivary}</span><i  class="fa-solid fa-check ml-2 text-dark btn btn-primary p-1"></i></>:<><span className='bg-success btn p-2'>{order.Order_Id.Delivary}</span></>}</td>
+            </tr> 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
         </div>
     </>
   )
 }
 
 export default ProductRivie
-// //{e.Payment_Status === 'Complete' ? (
-//   <i className="fa-solid fa-check text-warning"></i>
-//   ) : (
-//     <i className="fa-solid fa-clock"></i>
-//   )}
-// </span>{e.Payment_Status}</span > 

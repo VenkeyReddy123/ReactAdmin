@@ -1,117 +1,133 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { ResponsiveBar } from '@nivo/bar';
+import { style } from 'd3';
+import { Border } from 'victory';
 
-const Model = () => {
-    return (
-        <>
-           <div className='container-fluid p-2' style={{background:'#F5F7FA'}}>
-                <div className='row mb-2 '>
-                    <div className='model col-md-11 col-lg-5 shadow-lg ml-3 mr-5'>
-                        <div className='model-header d-flex flex-column '>
-                            <div className='d-flex flex-row mt-3 justify-content-between'>
-                                <div className='d-flex flex-row'>
-                                    <h6>Total Orders</h6>
-                                    <div className='bg-warning mb-3 ml-3 rounded-circle' style={{ width: 80 }}>
-                                        <h6 className='align-middle   ml-3'>-6.8%</h6>
-                                    </div>
-                                </div>
-                                <h5 className='mr-5'>16,2400</h5>
-                            </div>
-                          <h5>Last 7 days</h5>
-                        </div>
-                        <div className='model-body p-2 shadow-lg'>
+const OrdersChart = () => {
+  const [data, setData] = useState(null);
+  const [Smdata, setSmdata] = useState([])
 
-                            <div class="progress mt-3 d-flex flex-row ">
-                                <div class="progress-bar bg-primary " role="progressbar" style={{ width: "35%" }} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "90%" }} aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "75%" }} aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "25%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "20%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "45%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "75%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div className='model-footer d-flex flex-column mt-5 mb-4'>
-                        <span className='w-100 bg-dark' style={{height:2}}></span>
-                            <div className='d-flex flex-row justify-content-between '>
-                                <div className='d-flex flex-row align-items-center'>
-                                    <div className='bg-primary mt-1' style={{ width: '50px',height:15,borderRadius:'40px' }}>
-                                    </div>
-                                    <span className='align-middle ml-2'>Completed</span>
-                                </div>
-                                <span className='mr-5'>52%</span>
-                            </div>
-                            <div className='d-flex flex-row justify-content-between '>
-                                <div className='d-flex flex-row align-items-center'>
-                                    <div className='shadow-lg  mt-1'     style={{ width: '50px',height:15,borderRadius:'40px',background:'#F5F7FA' }}>
-                                    </div>
-                                    <span className='align-middle ml-2'>Pendding Payment</span>
-                                </div>
-                                <span className='mr-5'>48%</span>
-                            </div>
-                        </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/LCODetails/");
+        const FilterData = response.data.filter((e) => {
+          return e.Order_Id.username === Number(localStorage.getItem('id'));
+        });
 
-                    </div>
-                    <div className='model col-md-11 col-lg-5 shadow-lg ml-3 mr-5'>
-                        <div className='model-header d-flex flex-column '>
-                            <div className='d-flex flex-row mt-3 justify-content-between'>
-                                <div className='d-flex flex-row'>
-                                    <h6>New Custemors</h6>
-                                    <div className='bg-warning mb-3 ml-3 rounded-circle' style={{ width: 80 }}>
-                                        <h6 className='align-middle   ml-3'>+26.5%</h6>
-                                    </div>
-                                </div>
-                                <h5 className='mr-5'>356</h5>
-                            </div>
-                          <h5>Last 7 days</h5>
-                        </div>
-                        <div className='model-body'>
+        const date = new Date();
+        let TooDay = [];
+        let OnDay = [];
+        let TwDay = [];
+        let ThreDay = [];
+        let FDay = [];
+        let FiDay = [];
+        let SDay = [];
+        FilterData.forEach((e) => {
 
-                            <div class="progress mt-3 d-flex flex-row ">
-                                <div class="progress-bar bg-primary " role="progressbar" style={{ width: "15%" }} aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "40%" }} aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "15%" }} aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "55%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "70%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "65%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-primary" role="progressbar" style={{ width: "85%" }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div className='model-footer d-flex flex-column mt-5 mb-4'>
-                            
-                            <span className='w-100 bg-dark' style={{height:2}}></span>
-                        </div>
+          if (new Date().toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            TooDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            OnDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            TwDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 3)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            ThreDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 4)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            FDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 5)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString() && e.Order_Id.OrderCancel == 'No') {
+            FiDay.unshift(e);
+          } else if (new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString() === new Date(e.Order_Id.Date).toLocaleDateString()) {
+            SDay.unshift(e);
+          }
 
-                    </div>
-                   
-                </div>
+        });
 
-            </div> 
-        </>
-    )
-}
+        const chartData = [
+          { country: new Date().toLocaleDateString(), value: TooDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString(), value: OnDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString(), value: TwDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 3)).toLocaleDateString(), value: ThreDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 4)).toLocaleDateString(), value: FDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 5)).toLocaleDateString(), value: FiDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString(), value: SDay.length },
+        ];
+        setData(chartData)
+        const charSmalltData = [
+          { country: new Date().getDate(), value: TooDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 1)).getDate(), value: OnDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 2)).getDate(), value: TwDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 3)).getDate(), value: ThreDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 4)).getDate(), value: FDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 5)).getDate(), value: FiDay.length },
+          { country: new Date(new Date().setDate(new Date().getDate() - 6)).getDate(), value: SDay.length },
+        ];
+        setSmdata(charSmalltData)
 
-export default Model
+
+
+        setData(chartData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <>
+      <div className='p-2' style={{ width: '100%', height: '450px', }}>
+        <small className='text-primary h6' style={{ textAlign: 'center' }}>Orders Count Last 7 Days</small>
+        {data &&
+
+          <>
+
+            <ResponsiveBar
+              className='d-none d-md-block'
+              data={Smdata}
+              keys={['value']}
+              indexBy="country"
+              margin={{ top: 20, right: 0, bottom: 50, left: 20 }}
+              padding={0.5}
+              colors={'blue'}
+              borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+              axisTop={null}
+              axisRight={null}
+              axisBottom={{
+                tickSize: 40,
+                tickPadding: 0,
+                tickRotation: 0,
+                legend: 'Orders Dates',
+                legendPosition: 'middle',
+                legendOffset: 20,
+              }}
+              axisLeft={{
+                tickSize: 0,
+                tickPadding: 10,
+                tickRotation: 0,
+                legend: 'Orders Count',
+                legendPosition: 'middle',
+                legendOffset: -10,
+                tickValues: Array.from({ length: 11 }, (_, i) => i * 5),
+              }}
+              labelSkipWidth={10}
+              labelSkipHeight={12}
+              labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+              animate={true}
+              motionStiffness={90}
+              motionDamping={15}
+            />
+
+
+          </>
+        }
+      </div>
+      
+    </>
+
+  );
+};
+
+export default OrdersChart;

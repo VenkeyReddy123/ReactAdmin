@@ -4,69 +4,98 @@ import { useNavigate } from 'react-router-dom'
 
 const Forget = () => {
     const navigate = useNavigate()
-    const [User, setUser] = useState(true)
+    const [email, setemail] = useState(true)
     const [Otp, setOtp] = useState(false)
     const [Pass, setPass] = useState(false)
-    const [un, setun] = useState('')
+    const [em, setem] = useState('')
     const [otp, setotp] = useState(0)
     const [npw, setnpw] = useState('')
     const [napw, setnapw] = useState('')
+    const [VAEPOP, SetVAEPOP] = useState(false)
+    const [OTPSPOP, SetOTPSPOP] = useState(false)
+    const[VAOTPPOP,SetVAOTPPOP]=useState(false)
+    const[PWPOP,SETPOP]=useState(false)
+    const[PSUPOP,SETPSUPOP]=useState(false)
+    const[OtpWar,SetOtpWar]=useState(false)
     const HandleSendOtp = () => {
-      const  Data = { 'username': un }
-        axios.post(" http://127.0.0.1:8000/OtpDetails/", Data).then((d) => {
-            alert('Otp Sended')
-            localStorage.setItem('otp',d.data.Message)
-            localStorage.setItem('username',un)
-            setUser(!User)
-            setOtp(!Otp)
-        }).catch((e) => {
-            alert("Invalid User")
-        })
+        axios.post('http://127.0.0.1:8000/UserOtpDetails/', { username: em })
+            .then(response => {
+                localStorage.setItem('otp',Number(response.data.Message))
+                SetOTPSPOP(true)
+                setemail(!email)
+                setOtp(!otp)
+                
+            })
+            .catch(error => {
+               SetVAEPOP(true)
+            });
 
-    }
+    };
     const HandleRecivedOtp = () => {
+        SetVAOTPPOP(false)
+        SetOTPSPOP(false)
+        SetVAEPOP(false)
+        
+    
+        if( String(otp).length>4 ||String(otp).length<4 ){
+            SetOtpWar(true)
+            return
+        }
+    
         if(otp==Number(localStorage.getItem('otp'))){
             setOtp(!Otp)
             setPass(!Pass)
         }
         else{
-            alert('InValid Otp')
+           SetVAOTPPOP(true)
         }
         
+    }
+     const HadnleAGinSendOtp=()=>{
+        SetOTPSPOP(false)
+        axios.post('http://127.0.0.1:8000/UserOtpDetails/', { username: em })
+            .then(response => {
+                localStorage.setItem('otp', Number(response.data.Message))    
+                SetOTPSPOP(true)
+            })
+            .catch(error => {
+                SetVAEPOP(true)
+            });
+
     }
     const HandleChangePassword = () => {
         if(npw===napw){
             const Data={
-                "username":String(localStorage.getItem('username')),
+                "username":em,
                 "password":npw
             }
             axios.patch("http://127.0.0.1:8000/ForgetDetails/",Data).then((d)=>{
-                alert('CHnaged Success Fully')
+                SetOTPSPOP(true)
                 navigate("/")
             }).catch((e)=>{
                 alert('Please Try Again')
             })
         }
         else{
-            alert('Passwords Are Not MAtched')
+           SETPOP(true)
         }
        
     }
     return (
         <>
-            <div className='container-fluid' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url('https://t4.ftcdn.net/jpg/05/72/54/67/360_F_572546714_2mn39TUv2f5Lmg7JRT9yvSkuTJERGyg8.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', height: '100vh' }}>
-                {User &&
+            <div className='container-fluid' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',  backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', height: '100vh' }}>
+                {email &&
 
                     <form onSubmit={(e) => {
                         e.preventDefault()
                         HandleSendOtp()
 
 
-                    }} className='form-group text-center shadow-lg' style={{ background: 'light', borderRadius: '50px', maxWidth: '400px', width: '90%' }}>
+                    }} className='form-group text-center shadow-lg' style={{ background: 'light', borderRadius: '20px', maxWidth: '400px', width: '90%' }}>
 
                         <div className='mt-4 mx-3'>
-                            <label htmlFor="ml" className='form-label text-warning'>Enter Your Username  <span style={{ color: 'red' }}>*</span></label>
-                            <input type="text" className='form-control' onChange={(e) => { setun(e.target.value) }} placeholder='Enter Your Username' name='ml' id='ml' required />
+                            <label htmlFor="ml" className='form-label text-warning'>Enter  username  <span style={{ color: 'red' }}>*</span></label>
+                            <input type="text" className='form-control' onChange={(e) => { setem(e.target.value) }} placeholder='Enter Your username' name='ml' id='ml' required />
                         </div>
                         <span className='text-danger'>You Can Recive Otp Registed Email </span>
 
@@ -76,28 +105,22 @@ const Forget = () => {
                         </div>
                     </form>
                 }
-
-
-                {/* Otp Sending */}
-
-                {Otp && <form onSubmit={(e) => {
-                    e.preventDefault()
-                    HandleRecivedOtp()
-
-
-                }} className='form-group text-center shadow-lg' style={{ background: '#004646', borderRadius: '50px', maxWidth: '400px', width: '90%' }}>
+                {Otp && <div  className='form-group text-center shadow-lg' style={{ borderRadius: '15px', maxWidth: '400px', width: '90%' }}>
 
                     <div className='mt-4 mx-3'>
                         <label htmlFor="ml" className='form-label text-warning'>Enter OTP<span style={{ color: 'red' }}>*</span></label>
-                        <input type="number" className='form-control' onChange={(e) => { setotp(e.target.value) }} placeholder='Enter Your Otp' name='ml' id='ml' required />
+                        <input type="number" className='form-control' onChange={(e) => { setotp(e.target.value) }} placeholder='Enter Your Otp' name='ml' id='ml'  />
                     </div>
                     <span className='text-danger'>You Can Recive Otp Registed Email </span>
 
 
                     <div className='text-center mb-2'>
-                        <input type="submit" value="Submit Otp" className='btn btn-primary mt-2' />
+                    <button   className='btn btn-primary mt-2' onClick={HandleRecivedOtp} >Submit Otp</button>
                     </div>
-                </form>}
+                    <div className=' mb-2'>
+                        <button  className='btn btn-warning mt-2' onClick={HadnleAGinSendOtp} >Resend Otp</button>
+                    </div>
+                </div>}
 
 
 
@@ -110,7 +133,7 @@ const Forget = () => {
                     HandleChangePassword()
 
 
-                }} className='form-group shadow-lg mt-2' style={{ background: '#004646', borderRadius: '50px', maxWidth: '400px', width: '90%' }}>
+                }} className='form-group shadow-lg mt-2' style={{ borderRadius: '20px', maxWidth: '400px', width: '90%' }}>
 
                     <div className='mt-4 mx-3'>
                         <label htmlFor="ml" className='form-label text-warning'>Enter New Password  <span style={{ color: 'red' }}>*</span></label>
@@ -126,6 +149,91 @@ const Forget = () => {
                         <input type="submit" value="ChangePassword" className='btn btn-primary mt-4' />
                     </div>
                 </form>}
+                {VAEPOP && <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-success p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SetVAEPOP(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>Enter Email is Not Registred</span>
+                    </div>
+                </div>
+            </>}
+            {OTPSPOP&& <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-dark p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SetOTPSPOP(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>OTP sent successfully!</span>
+                    </div>
+                </div>
+            </>}
+
+            {VAOTPPOP&& <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-warning p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SetVAOTPPOP(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>You Entred Wrong OTP Number</span>
+                    </div>
+                </div>
+            </>}
+            {PWPOP&& <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-primary p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SETPOP(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>Please Entre New Password And Again Password Same</span>
+                    </div>
+                </div>
+            </>}
+            {PSUPOP&& <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-primary p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SETPSUPOP(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>Password Changed Successfully!</span>
+                    </div>
+                </div>
+            </>}
+            {OtpWar&& <>
+                <div className='col-12 mb-3 d-flex flex-row justify-content-end' style={{ position: 'absolute', top: '10px', borderRadius: '30px' }}>
+                    <div className=' bg-primary p-2' style={{ borderRadius: '15px' }}>
+                        <div className='col-12 d-flex flex-row justify-content-end '>
+                            <i class="fa-regular fa-circle-xmark text-white bg-danger" onClick={() => {
+                                SetOtpWar(false)
+
+                            }} style={{ fontSize: '20px', borderRadius: '15px' }}></i>
+
+                        </div>
+                        <span className='text-white p-5 pw'>Please enter 4 disgits of otp</span>
+                    </div>
+                </div>
+            </>}
 
 
             </div>

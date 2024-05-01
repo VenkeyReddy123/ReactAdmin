@@ -5,6 +5,21 @@ import axios from 'axios'
 import './Category.css'
 import Sidebar from './Sidebar'
 import Navbar from '../Navbar'
+import Sidebar2 from './SideBar2'
+import Dsidebar from './Dsidebar'
+import ResizedImage from '../ResizedImage'
+import ReactQuill from 'react-quill';
+import Profile from './Profile'
+import { Books_Music, Electrinics } from '../Data.jsx'
+import { Clothing } from '../Data.jsx'
+import { Footware } from '../Data.jsx'
+import { Accesories } from '../Data.jsx'
+import { Beauty_PersonCare } from '../Data.jsx'
+import { Home_Kitchen } from '../Data.jsx'
+import { Furniture } from '../Data.jsx'
+import { Sports } from '../Data.jsx'
+import { Health } from '../Data.jsx'
+import { Toys_Games } from '../Data.jsx'
 
 
 const Modify = () => {
@@ -17,112 +32,180 @@ const Modify = () => {
   const [editDiscount, setEditedDiscount] = useState()
   const [global, setGlobal] = useState([])
   const [change, setChange] = useState("")
+  const [Sugg, setSugg] = useState([])
+  const [Pro, setPro] = useState(false)
+  const [Des, setDes] = useState("")
+  const [Pop, setPop] = useState(false)
+  const [Hig, setHigh] = useState("")
+  const [Bottom, setBottom] = useState(false)
+  const [Del, setDel] = useState(0)
+  const [C_N, setC_N] = useState("")
+  const [Product, setProduct] = useState([])
+  const [Cat, setCat] = useState()
+  const [image, setImage] = useState(null)
+  const [EImage, setEImage] = useState(false)
+  const [ImageUrlList, setImageUrlList] = useState([])
+  const [ImageUrl, SetImageUrl] = useState([])
+  const [selectedCategoryName, setSelectedCategoryName] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState("")
+  const [DownCondition, SetDownCondtion] = useState(false)
+  const [DropDown, SetDropDown] = useState([])
+  const [Brand, setBrand] = useState("")
+  const [Color, setColor] = useState("")
+  const [general, SetGeneral] = useState("")
+  const [ImageLimit, SetImageLimit] = useState(0)
+  const [Info, SetInfo] = useState(false)
+  const [Pro1, setPro1] = useState(false)
+  const [ShowFilter,SetShowFilter]=useState(false)
+  const ProF = () => {
+    setPro1(false)
+  }
 
-  const handleImageChange = (event) => {
+  const BottomClicked = (click) => {
+    if (click) {
+      setBottom(false)
+      return
+    }
+    setBottom(!Bottom)
 
-    const file = event.target.files[0];
-    // Check if file size exceeds 5 MB
-    if (file && file.size > 3 * 1024 * 1024) {
-      alert('File size exceeds 3 MB. Please select a smaller file.');
-      event.target.value = null; // Clear file input
-    } else {
-      const reader = new FileReader();
+  }
 
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const desiredWidth =1000 // Desired width
-          const desiredHeight =1000; // Desired height
-          canvas.width = desiredWidth;
-          canvas.height = desiredHeight;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, desiredWidth, desiredHeight);
 
-          canvas.toBlob((blob) => {
-            const resizedFile = new File([blob], file.name, { type: file.type });
-            setEditImage(resizedFile);
-          }, file.type, 0.10); // Adjust the quality (0.7 means 70% quality)
-        };
-        img.src = e.target.result;
-      };
-      if (file) {
-        reader.readAsDataURL(file);
+  const handleImageChange = async (event) => {
+
+    const files = event.target.files;
+    const Arr = [];
+    const quality = 0.9
+    for (let i = 0; i < files.length; i++) {
+      if (i < ImageLimit) {
+        const resizedFile = await resizeAndPush(files[i], quality);
+        Arr.push(resizedFile);
+
+
       }
 
     }
+    console.log(Arr)
 
 
+    setEditImage(Arr)
+    setEImage(true)
+    async function resizeAndPush(file, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const desiredWidth = 200; // Desired width
+            const desiredHeight = 200; // Desired height
+            canvas.width = desiredWidth;
+            canvas.height = desiredHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, desiredWidth, desiredHeight);
+
+            canvas.toBlob((blob) => {
+              const resizedFile = new File([blob], file.name, { type: file.type });
+              resolve(resizedFile); // Resolve with resized file
+            }, file.type, quality); // Pass quality as the third argument
+          };
+          img.src = e.target.result;
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        } else {
+          reject(new Error('File not provided'));
+        }
+      });
+    }
   };
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/ProductDispalyView/").then((d) => {
-      const filteredData = d.data.filter((e) => {
+    axios.get("http://127.0.0.1:8000/SuggestDetails/").then((d) => {
+      const Sugg = d.data
 
-        return e.Product_Name.username === Number(localStorage.getItem('id'));
-      });
-      setGlobal(filteredData)
-      setProducts(filteredData)
+      axios.get("http://127.0.0.1:8000/TopDealsDetails/").then((d) => {
+        const Top = d.data
+        axios.get("http://127.0.0.1:8000/ProductDispalyView/").then((d) => {
+          setdata(d.data)
+          const filteredData = d.data.filter((e) => {
+            Top.map((p) => {
+              if (e.Product_Name.id == p.Product_Name.id) {
+                e.Add = true
+
+              }
+            })
+            Sugg.map((e2) => {
+              if (e.Product_Name.id == e2.Product_Name.id) {
+
+                e.Sugg = true
+
+              }
+            })
+            return e.Product_Name.username === Number(localStorage.getItem('id'));
+          });
+
+          setGlobal(filteredData)
+          setProducts(filteredData)
+        })
+
+      })
     })
   }, [])
 
-  const handleEdit = (index, productName, price, stack, Discount) => {
-    setEditedIndex(index)
-    setEditedProductName(productName);
-    setEditedPrice(price);
-    setEditedStack(stack)
-    setEditedDiscount(Discount)
+  const handleEdit = (e) => {
+    setEditedProductName(e.Product_Name.Product_Name);
+    setEditedPrice(e.Product_Name.Price);
+    setEditedStack(e.Product_Name.Stack)
+    setEditedDiscount(e.Product_Name.Discount)
+    setDes(e.Product_Name.Description)
+    setHigh(e.Product_Name.Hightlet)
+    setDel(e.Product_Name.Delivary_Charges)
+    setC_N(e.Product_Name.Category_Name)
+    setCat(e.Product_Name.Category)
+    setBrand(e.Product_Name.Brand)
+    setColor(e.Product_Name.Color)
+    SetGeneral(e.Product_Name.Specifications)
+    setProduct(e)
 
-    // Here you can open a modal or expand the corresponding product for editing
+    if (e.List_Urls) {
+      setImageUrlList(e.List_Urls.split(" "))
+      SetImageLimit(e.List_Urls.split(" ").length)
+
+    } else {
+      setImageUrlList([e.ImageUrl])
+      SetImageLimit([e.ImageUrl].length)
+
+
+    }
+    handleCategory(e.Product_Name.Category)
   };
 
-  const handleSave = (index, e) => {
-    if (!editimage) {
-      alert("please Select Image Path For Image ")
-      return
-    }
+  const handleSave = async () => {
+
     const Data = {
-      "pk": e.Product_Name.id,
+      "pk": Product.Product_Name.id,
       "Product_Name": editedProductName,
       "Stack": editStack,
       "Price": editedPrice,
-      "Discount": editDiscount
+      "Discount": editDiscount,
+      "Description": String(Des),
+      "Category": Cat,
+      "Category_Name": C_N,
+      "Hightlet": String(Hig),
+      "Delivary_Charges": Del,
+      "Brand": Brand,
+      "Color": Color,
+      "Specifications": String(general)
+
     }
-    axios.patch("http://127.0.0.1:8000/ProductDetails/", Data).then((d) => {
-      const ImgData = {
-        "pk": e.id,
-        "P_Images": editimage
-      }
-      axios.patch("http://127.0.0.1:8000/ImageDetails/", ImgData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-      ).then((d) => {
-        console.log(d.data)
-        const ImgData = {
-          "pk": d.data.id,
-          "P_Images": d.data.P_Images
-        }
-        console.log(ImgData)
-
-        axios.patch("http://127.0.0.1:8000/UpdateDetails/", ImgData).axios((d) => {
-          alert("Success")
-          return
-        }).catch((e) => {
-          alert("Please Try Again Later")
-
-        })
-      }).catch((e) => {
-        alert("SUccess")
-
-
-      })
+    await axios.patch("http://127.0.0.1:8000/ProductDetails/", Data).then((d) => {
     }).catch((e) => {
+
       alert('Please Try Again Later')
     })
-
-    setEditedIndex(null); // Reset editedIndex after saving
   };
 
   const handleCatgerory = (type) => {
@@ -131,131 +214,866 @@ const Modify = () => {
     }
     else {
       const Data = global.filter((e) => {
-        return e.Product_Name.Category == type | e.Product_Name.Category_Name == type
+        return e.Product_Name.Category == type ||
+          e.Product_Name.Category_Name == type ||
+          e.Product_Name.Product_Name.toLowerCase().includes(type.toLowerCase());
+      });
+
+      setProducts(Data);
+    }
+
+
+  }
+  const HandleDelete = async (e) => {
+    const Data = {
+      "pk": e.Product_Name.id
+    }
+    let Value = null
+    await axios.get("http://127.0.0.1:8000/OrderDetails/").then((d) => {
+      const Filter = d.data.filter((e) => {
+        return e.Product_Name == Data.pk && (e.Delivary == 'No' && e.OrderCancel == 'No')
       })
-      setProducts(Data)
-    }
-
-
-  }
-  const HandleDelete = (e) => {
-    console.log(e)
-    const data = {
-      "pk": e.id
-    }
-    axios.delete("http://127.0.0.1:8000/ImageDetails/", data).then((d) => {
-      alert('Success TO Delete')
-    }).catch((e) => {
-      alert("Please Try AGian")
+      Value = Filter.length > 0 ? false : true
     })
-  }
-  const [pw,setpw]=useState('')
-  const[rpw,setrpw]=useState('')
-  const [un,setun]=useState('')
-  const[run,setrun]=useState('')
-  const[Con2,setCon2]=useState(false)
-  const[Con1,setCon]=useState(false)
-  const HandlePassword=(e)=>{
-    e.preventDefault()
-    if(pw.length>1){
-      if(pw===rpw){
-        const Data={
-          'pk':Number(localStorage.getItem('id')),
-          'password':pw
-        }
-        axios.patch("http://127.0.0.1:8000/UserDetails/",Data).then((d)=>{
-            alert("Password CHanged Sucessfully")
-        }).catch((e)=>{
-          alert('Please Try Again LAter ')
-        })
-    }
-    else{
-      alert('Password are not matched')
-    }
-    }
-    Condition1()
-    
-     
-  }
-  const Condition1=(val)=>{
-    
-    if(val==='User'){
-      setCon2(!Con2)
-    }
-    else{
-      setCon(!Con1)
-    }
-  }
-  const Condition3=()=>{
-    setCon(!Con1)
-  }
-  const Condition2=()=>{
-    setCon2(!Con2)
-  }
-  
-  const HandleUsername=(e)=>{
-    e.preventDefault()
-    if(un.length>1){
-      if(un===run){
-        const Data={
-          'pk':Number(localStorage.getItem('id')),
-          'password':localStorage.getItem('Password'),
-          'username':un
-        }
-        console.log(Data)
-       
 
-        axios.patch("http://127.0.0.1:8000/UserDetails/",Data).then((d)=>{
-            alert("Username Changed Sucessfully")
-        }).catch((e)=>{
-          alert('Please Try Again LAter ')
-        })
+    if (Value) {
+
+    } else {
+      setPop(!Pop)
+      return
     }
-    else{
-      alert('Password are not matched')
+    const data = {
+      "pk": e.Product_Name.id
     }
-    }
-    Condition2()
-    
-     
+    axios.delete("http://127.0.0.1:8000/ProductDetails/", { data })
+      .then((response) => {
+        window.location.reload(); // Reload the page after successful deletion
+      })
+      .catch((error) => {
+
+        alert("Please Try Again");
+      });
   }
-  
+  const [pw, setpw] = useState('')
+  const [rpw, setrpw] = useState('')
+  const [un, setun] = useState('')
+  const [run, setrun] = useState('')
+  const [Con2, setCon2] = useState(false)
+  const [Con1, setCon] = useState(false)
+  const HandleTopDeals = (Pro, type) => {
+    if (type == 'Add') {
+      const Data = {
+        "ImageUrl": Pro.id,
+        "username": Number(localStorage.getItem('id')),
+        "Product_Name": Pro.Product_Name.id
+      }
+      axios.post("http://127.0.0.1:8000/TopDealsDetails/", Data).then((d) => {
+        window.location.reload()
+      }).catch((e) => {
+        window.location.reload();
+      })
+    } else {
+
+      const data = {
+        "id": Pro.id
+      }
+      axios.delete("http://127.0.0.1:8000/TopDealsDetails/", { data }).then((d) => {
+
+        window.location.reload();
+      }).catch((e) => {
+        alert('Please Try Again')
+      })
+    }
+  }
+  const HandleSuggest = (Pro, type) => {
+    if (type == 'Add') {
+      const Data = {
+        "ImageUrl": Pro.id,
+        "username": Number(localStorage.getItem('id')),
+        "Product_Name": Pro.Product_Name.id
+      }
+      console.log(Data)
+      axios.post("http://127.0.0.1:8000/SuggestDetails/", Data).then((d) => {
+        window.location.reload()
+      }).catch((e) => {
+        window.location.reload();
+      })
+    } else {
+
+      const data = {
+        "id": Pro.id
+      }
+      axios.delete("http://127.0.0.1:8000/SuggestDetails/", { data }).then((d) => {
+
+        window.location.reload();
+      }).catch((e) => {
+        alert('Please Try Again')
+      })
+    }
+  }
+  const [Show, setShow] = useState(false)
+  const ShowSide2 = () => {
+    setShow(!Show)
+  }
+  const handleCategoryChange = (event) => {
+    if ("Electronic".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Electrinics
+
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    } else if ("Clothing".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Clothing
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    }
+    else if ("Footware".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Footware
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    } else if ("Accessories".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Accesories
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    } else if ("Beauty&Person Care".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Beauty_PersonCare
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Home&Kitchen".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Home_Kitchen
+      SetDownCondtion(true)
+      SetDropDown(Data)
+      setCat(event.target.value)
+    }
+    else if ("Furniture".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Furniture
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Books,Movies&Music".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Books_Music
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Sports".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Sports
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Health".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Health
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Toys&Games".includes(event.target.value)) {
+      setCat(event.target.value)
+      const Data = Toys_Games
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+
+  };
+  const handleCategory = (event) => {
+    if ("Electronic".includes(event)) {
+
+      const Data = Electrinics
+      console.log(Data)
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    } else if ("Clothing".includes(event)) {
+
+      const Data = Clothing
+      console.log(Data)
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    }
+    else if ("Footware".includes(event)) {
+
+      const Data = Footware
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    } else if ("Accessories".includes(event)) {
+
+      const Data = Accesories
+      SetDownCondtion(true)
+      SetDropDown(Data)
+    } else if ("Beauty&Person Care".includes(event)) {
+
+      const Data = Beauty_PersonCare
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Home&Kitchen".includes(event)) {
+
+      const Data = Home_Kitchen
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Furniture".includes(event)) {
+
+      const Data = Furniture
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Books,Movies&Music".includes(event)) {
+
+      const Data = Books_Music
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if (("Sports".includes(event))) {
+
+      const Data = Sports
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Health".includes(event)) {
+
+      const Data = Health
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+    else if ("Toys&Games".includes(event)) {
+
+      const Data = Toys_Games
+      SetDownCondtion(true)
+      SetDropDown(Data)
+
+    }
+
+  };
+  const HandleCategory_Name = (event) => {
+    const name = DropDown[event.target.value]
+    setC_N(name)
+  }
+  const [HoverList, SetHoverList] = useState([])
+
+  const HandleCategoryHover = (event) => {
+
+    if ("Electronic".includes(event)) {
+
+      const Data = Electrinics
+
+      SetHoverList(Data)
+
+    } else if ("Clothing".includes(event)) {
+
+      const Data = Clothing
+      SetHoverList(Data)
+
+    }
+    else if ("Footware".includes(event)) {
+
+      const Data = Footware
+      SetHoverList(Data)
+
+
+    } else if ("Accessories".includes(event)) {
+
+      const Data = Accesories
+      SetHoverList(Data)
+
+    } else if ("Beauty&Person Care".includes(event)) {
+
+      const Data = Beauty_PersonCare
+      SetHoverList(Data)
+
+
+    }
+    else if ("Home&Kitchen".includes(event)) {
+
+      const Data = Home_Kitchen
+      SetHoverList(Data)
+
+
+    }
+    else if ("Furniture".includes(event)) {
+
+      const Data = Furniture
+      SetHoverList(Data)
+
+    }
+    else if ("Books,Movies&Music".includes(event)) {
+
+      const Data = Books_Music
+      SetHoverList(Data)
+
+
+    }
+    else if (("Sports".includes(event))) {
+
+      const Data = Sports
+      SetHoverList(Data)
+
+
+    }
+    else if ("Health".includes(event)) {
+
+      const Data = Health
+      SetHoverList(Data)
+
+
+    }
+    else if ("Toys&Games".includes(event)) {
+
+      const Data = Toys_Games
+      SetHoverList(Data)
+
+
+    }
+  }
+  // const [HoverList2,SetHoverList2]=useState([])
+  const HandleCategoryHover2 = (event) => {
+
+    
+  }
+  const HandleHoveChange = (type) => {
+    const Data = global.filter((e) => {
+      return e.Product_Name.Category_Name == type
+    });
+
+    setProducts(Data);
+    if (Data.length > 0) {
+      SetHoverList([])
+    }
+  }
+
+  const HandleSave = async () => {
+    if (EImage) {
+      for (let image of editimage) {
+        const ImgData = {
+          "pk": Product.id,
+          "P_Images": image
+        }
+        await axios.patch("http://127.0.0.1:8000/Image3Details/", ImgData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(async (d) => {
+
+          const Data = {
+            "pk": d.data.id,
+            "P_Images": d.data.P_Images,
+            "Ind": 1
+          }
+
+          await axios.patch("http://127.0.0.1:8000/ImageDetails/", Data).then((d) => {
+
+          }).catch((e) => {
+            console.log('error')
+          })
+        }).catch((e) => {
+          console.log('error')
+        })
+
+
+
+
+      }
+
+      window.location.reload()
+    }
+    else {
+      window.location.reload()
+    }
+
+
+  }
+  const RemoveImages = (url1) => {
+    const FilterImages = ImageUrlList.filter((url2) => {
+      return url1 !== url2
+    })
+    const Url = FilterImages[0]
+
+    const Data = {
+      pk: Product.id,
+      List_Urls: FilterImages,
+      ImageUrl: Url
+    };
+    setImageUrlList(FilterImages)
+    SetImageLimit(5 - FilterImages.length)
+
+    axios.patch('http://127.0.0.1:8000/RemoveImages/', Data).then((d) => {
+    }).catch((e) => {
+      console.log('error')
+    })
+
+
+  }
+  const [data, setdata] = useState([])
+  const [Sug, setSug] = useState([])
+  const [DataList, SetDataLIst] = useState([])
+  const [inval, setinval] = useState('')
+  useEffect(() => {
+    if (data.length > 0) {
+      const List = []
+      data.map((e) => {
+        List.unshift(e.Product_Name.Product_Name)
+      })
+      SetDataLIst(List)
+
+    }
+  }, [data])
+  useEffect(() => {
+
+    if (inval.length >= 2) {
+
+      const Filter = DataList.filter((e) => {
+        return String(e).toLowerCase().includes(`${inval}`.toLowerCase());
+      });
+
+
+
+      const Filter2 = Filter.map((e) => {
+        const val = e.toLowerCase()
+        return val
+      })
+      setSug([...new Set(Filter2)]);
+    } else {
+      setSug([]);
+    }
+  }, [inval, DataList]);
+  const HandleInputValue = (event) => {
+    const Value = event.target.value
+    if (Value.length > 0) {
+      setinval(Value)
+
+    } else {
+      setinval('')
+    }
+
+  }
+  const HandleNaviProduct = (val) => {
+    const Filter = data.filter((pro) => {
+      if (pro.Product_Name.Product_Name.toLowerCase().includes(String(val.toLowerCase()))) {
+        return pro
+      }
+    })
+    if (Filter.length > 0) {
+        setProducts(Filter)
+        setSug([])
+        setinval('')
+    }
+  }
+
+
   return (
     <>
-      <div>
-        <Navbar />
+      <div className='mod'>
+        <Navbar ShowSide2={ShowSide2} BottomClicked={BottomClicked} />
       </div>
-      <div>
-      <div>
-      <Sidebar Condition1={Condition1}/>
-      </div>
-      </div>
-      {/* visible only large screen  */}
-      <div className=' bg-dark'>
-        <div className=' container-fluid d-none d-sm-block text-white'>
-          <div className='d-flex flex-row justify-content-between' style={{ height: '50px', overflowX: 'hidden' }}>
-            <h6 className='mt-2'>Filter By You'r Product by Catagery Wise </h6>
-            <input className='ml-auto form-control  mt-1' type="text" placeholder='Search by Catagery Name' onChange={(e) => { setChange(e.target.value) }} style={{ height: '40px', borderRadius: '30px' }} />
-            <button className='btn btn-primary ml-auto mr-auto mt-1' onClick={() => { handleCatgerory(change) }} style={{ height: '40px' }}>Search</button>
+      <div className=' col-12  ' style={{ overflow: 'hidden' }} >
+        <div className='d-flex flex-row  p-2 card mt-1' style={{ backgroundColor: 'white' }}>
+          <div className='mod  col-md-4 col-lg-3 d-none d-md-block ml-auto'>
+
+            <h6 className='mt-2 mod'>Filter By You'r Product by Product_Name </h6>
+
           </div>
+          <div className='col-12 col-md-8 p-1 ml-auto' style={{ position: 'relative' }}>
+            <input onChange={HandleInputValue} value={inval} type="text" className='form-control web2' placeholder='search by Products Name' />
+          </div>
+
         </div>
       </div>
-      {/*  */}
-      {/*  */}
-      <div className='d-flex flex-row d-block d-sm-none' >
-        <input className='ml-auto col-8 mt-1' type="text" placeholder='Search by Catagery Name' onChange={(e) => { setChange(e.target.value) }} style={{ height: '40px', borderRadius: '40px' }} />
-        <button className='btn btn-primary ml-auto mr-auto mt-1' onClick={() => { handleCatgerory(change) }}>Search</button>
+      <div className=' col-12 d-block d-sm-none d-flex flex-row justify-content-end ' style={{ overflow: 'hidden' }} >
+       {!ShowFilter&&<> <span className='mr-2 btn btn-primary mt-2' onClick={()=>{SetShowFilter(true)}}> filter</span></>}
       </div>
-
-      {/*  */}
-      <div className='d-flex flex-row'>
-        <div className=' d-none d-sm-none d-sm-block col-sm-5 col-md-3 bg-info vh-100' style={{ overflowY: 'auto', overflowX: 'hidden', }}>
+      <div className='d-flex flex-row mod  ' style={{ overflow: 'hidden' }}>
+        <div className=' d-none  d-sm-block    bg-info vh-100' style={{ overflowY: 'auto', overflowX: 'hidden', width: '100%' }}>
           <div className='d-flex flex-column text-white'>
             <span className='btn text-white btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'All'
               handleCatgerory(type)
             }}>All</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span onMouseEnter={() => { HandleCategoryHover("Electronic") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Electronic'
+              handleCatgerory(type)
+            }}>Electronics</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Clothing") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Clothing'
+              handleCatgerory(type)
+            }}>Clothing</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Footware") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Footware'
+              handleCatgerory(type)
+            }}>Footware</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Accessories") }} className='btn text-white  btn1 ' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Accessories'
+              handleCatgerory(type)
+            }}>Accessories</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Beauty&Person") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Beauty&Person'
+              handleCatgerory(type)
+            }}>Beauty&Person</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Home&Kitchen") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Home&Kichen'
+              handleCatgerory(type)
+            }}>Home&Kichen</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Furniture") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Furniture'
+              handleCatgerory(type)
+            }}>Furniture</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Books,Movies&Music") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Book,Movies&Music'
+              handleCatgerory(type)
+            }}>Books,Movies&Musics</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Sports") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Sports'
+              handleCatgerory(type)
+            }}>Sports</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Health") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Health'
+              handleCatgerory(type)
+            }}>Health</span>
+            <span onMouseEnter={() => { HandleCategoryHover("Toys&Games") }} className='btn text-white btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Toys&Games'
+              handleCatgerory(type)
+            }}>Toys&Games</span>
+          </div>
+        </div>
+
+        <div className=' col-sm-8  col-lg-10 row' style={{ overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', height: '100vh' }}>
+
+          {products && products.slice().reverse().map((e, index) => {
+            return (
+              <div onMouseEnter={() => { SetHoverList([]) }} className='col-sm-12 col-md-6  d-sm-flex flex-sm-column d-flex-row mt-3' key={index}>
+                <div className='row'>
+                  <div className='col-12 text-center'>
+                    < img src={e.ImageUrl} alt="" height={'130px'} />
+                  </div>
+                  <div className='col-12 text-center'>
+
+                    <span className=''>{e.Product_Name.Product_Name}</span><br></br>
+                    <span><i className="fa-solid fa-indian-rupee-sign"></i>{e.Product_Name.Price}</span><br></br>
+                    <span>Stack-:<span className='text-info' style={{ fontWeight: 'bold' }}>{e.Product_Name.Stack}</span></span><br></br>
+                    <span>Discount-:<span className='text-danger'>{e.Product_Name.Discount}%</span></span><br></br>
+                    <span className='text-danger'>Selling Price:-  <span className='text-success'>{Math.trunc(e.Product_Name.Price - (e.Product_Name.Price * (e.Product_Name.Discount / 100)))}<i className="fa-solid fa-indian-rupee-sign ml-1"></i></span></span><br></br>
+                  </div>
+                  <div className='col-12 text-center'>
+                    <span className='btn btn-primary ml-3 mr-3' onClick={() => {
+                      setPro(!Pro)
+                      handleEdit(e)
+                    }}>
+                      <i className="fa-solid fa-pen-to-square mr-3"></i>Edit
+                    </span>
+                    <button className='btn btn-danger' onClick={() => { HandleDelete(e) }}><i className="fa-solid fa-trash mr-2"></i>Delete</button>
+
+                    <div className=' btn d-flex flex-row text-center col-12 mt-3'>
+                      {e.Add ? <>
+                        <button onClick={() => {
+                          HandleTopDeals(e, 'Dele')
+                        }} className='mr-auto ml-auto btn-success'>Remove in Top Deals</button></> : <><button onClick={() => {
+                          HandleTopDeals(e, 'Add')
+                        }} className='ml-auto mr-auto btn-warning'>Add in Top Deals</button></>}
+                    </div>
+                    <div className=' btn d-flex flex-row text-center col-12 mt-3'>
+                      {e.Sugg ? <>
+                        <button onClick={() => {
+                          HandleSuggest(e, 'Dele')
+                        }} className='mr-auto ml-auto btn-primary'>Remove in Suggest</button></> : <><button onClick={() => {
+                          HandleSuggest(e, 'Add')
+                        }} className='ml-auto mr-auto btn-info'>Add in Suggest</button></>}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )
+          })}
+
+        </div>
+
+        {HoverList.length > 0 && <>
+          <div className='d-flex flex-column card' style={{ position: 'absolute', top: '130px', left: '200px', }}>
+            {HoverList.map((e) => {
+              return (
+                <>
+                  <span onClick={() => { HandleHoveChange(e) }} style={{ cursor: 'pointer' }} className='p-2'>{e}</span>
+                </>
+              )
+            })}
+          </div>
+        </>}
+
+
+
+        {Pro && <div style={{ position: 'absolute', top: '100px', left: '10px', overflow: 'hidden' }} className='col-11 col-lg-11  bg-light mod'>
+          <div className='d-flex flex-row justify-content-end mt-2'>
+            <i class="fa-solid fa-xmark text-white bg-danger text-dark p-1 btn " onClick={() => {
+              setPro(!Pro)
+            }} style={{ borderRadius: '50px' }}></i>
+          </div>
+          <form className='col-12 row p-2' >
+            <div className='col-12 col-md-6 d-flex flex-column'>
+              <label htmlFor="">Product_Name</label>
+              <input style={{ fontSize: '15px', }} value={editedProductName} className='form-control' onChange={(e) => setEditedProductName(e.target.value)} />
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-row'>
+              <div className='col-6 d-flex flex-column'>
+                <label htmlFor="pn">Brand</label>
+                <input required className='form-control' value={Brand} onChange={(e) => { setBrand(e.target.value) }} type="text" placeholder='Enter Brand Name' />
+              </div>
+              <div className='col-6 d-flex flex-column'>
+                <label htmlFor="pn">Color</label>
+                <input required className='form-control' value={Color} onChange={(e) => { setColor(e.target.value) }} type="text" placeholder='Enter Color Names' />
+              </div>
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column'>
+              <label htmlFor="pc">Category</label>
+              <select style={{ overflow: 'hidden' }} required className='form-control' value={Cat} onChange={(e) => {
+                handleCategoryChange(e)
+              }}>
+                <option >
+                  -----------------
+                </option>
+                <option value="Electronic">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Footware">Footware</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Beauty&Person Care">Beauty&Person Care</option>
+                <option value="Home&Kitchen">Home&Kitchen</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Books,Movies&Music">Books, Movies&Music</option>
+                <option value="Sports">Sports</option>
+                <option value="Health">Health</option>
+                <option value="Toys&Games">Toys&Games</option>
+              </select><br></br>
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column'>
+              <label htmlFor="price">Category Name</label>
+              <div style={{ overflow: 'hidden' }} className='form-group'>
+                {DownCondition && (
+                  <select value={C_N} className='form-control' required onChange={(e) => {
+                    setC_N(e.target.value)
+                  }}>
+                    <option >
+                      -----------------
+                    </option>
+                    {DropDown.map((categoryName, index) => (
+                      <option key={index} value={categoryName}>
+                        {categoryName}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column'>
+              <label htmlFor="">Price</label>
+              <input style={{ fontSize: '15px', }} type='number' value={editedPrice} className='form-control' onChange={(e) => setEditedPrice(e.target.value)} />
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column'>
+              <label htmlFor="">Stack</label>
+              <input type='number' style={{ fontSize: '15px', }} value={editStack} className='form-control' onChange={(e) => { setEditedStack(e.target.value) }} />
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column mb-5'>
+              <label htmlFor="">Discount in Percentage</label>
+              <input type='number' style={{ fontSize: '15px', }} value={editDiscount} className='form-control' onChange={(e) => { setEditedDiscount(e.target.value) }} />
+              <label htmlFor="">Delivary_Charges</label>
+              <input onChange={(e) => { setDel(e.target.value) }} style={{ fontSize: '15px', fontWeight: 'bold', }} value={Del} className='form-control' />
+              {ImageUrlList.length < 5 && <> <div className=' mb-4 d-flex flex-column'>
+                <label htmlFor="image mt-5 ">Add images <span className='text-danger'>(Limit is {5 - ImageUrlList.length})</span></label>
+                <input multiple type="file" className='form-control-file' name="image" id="image" accept='image/*' onChange={(e) => { handleImageChange(e) }} />
+              </div>
+              </>}
+              <div className='col-12  row ' style={{ width: '100%', height: '100%' }}>
+                {ImageUrlList && ImageUrlList.map((e) => {
+
+                  
+                  return (
+                    <>
+                      <div className=' ml-2 mb-5' style={{ height: '120px', width: '100px' }}>
+                        {ImageUrlList.length == 1 ? <></> : <>
+                          <div className='col-12 ml-4 mt-1  d-flex flex-row justify-content-end'>
+                            <i onClick={() => { RemoveImages(e) }} class="fa-regular fa-circle-xmark   text-white bg-danger" style={{ borderRadius: '100px', fontSize: '15px', cursor: 'pointer' }} />
+                          </div>
+                        </>}
+
+                        <img srcSet={e} width={'100%'} height={'100%'} alt="" />
+                      </div>
+                    </>
+                  )
+
+                })}
+
+
+
+              </div>
+
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column mt-4 ' style={{ height: '300px' }}>
+              <label htmlFor="desc">Description</label>
+              <ReactQuill
+                theme="snow"
+                style={{ height: '200px' }}
+                modules={{
+                  toolbar: [
+                    [{ 'header': ['1', '2', '3', '4', '5', '6', '7'] }, { 'font': [] }],
+                    [{ 'size': ['10px', '15px', '20px', '25px'] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'color': ["Black", "White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Gray", "Brown", "Cyan", "Pink", "Magenta", "Lime", "Teal"] }]
+                  ]
+                }}
+                value={Des}
+                onChange={(e) => { setDes(e) }}
+
+              />
+
+
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column' style={{ height: '350px' }}>
+              <label htmlFor="">Hightlest</label>
+              <ReactQuill
+                theme="snow"
+                style={{ height: '250px' }}
+                modules={{
+                  toolbar: [
+                    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                    [{ 'size': ['10px', '15px', '20px', '25px'] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'color': ["Black", "White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Gray", "Brown", "Cyan", "Pink", "Magenta", "Lime", "Teal"] }]
+                  ]
+                }}
+                value={Hig}
+                onChange={(e) => {
+                  setHigh(e)
+                }}
+
+              />
+            </div>
+            <div className='col-12 col-md-6 d-flex flex-column' style={{ height: '350px' }}>
+              <label htmlFor="desc">General Specification <i style={{ fontWeight: '25px', color: 'blue' }} onMouseEnter={() => { SetInfo(true) }} onMouseLeave={() => { SetInfo(false) }} class="fa-solid fa-circle-info"></i> {Info && <><small className='shadow-lg p-2 ' style={{ position: 'relative', cursor: 'pointer', color: 'red' }}> to provide detailed content under each heading in the 'General Specifications' section </small></>}
+
+              </label>
+              <ReactQuill
+                theme="snow"
+                style={{ height: '250px' }}
+                modules={{
+                  toolbar: [
+                    [{ 'header': ['1', '2', '3', '4', '5', '6', '7'] }, { 'font': [] }],
+                    [{ 'size': ['10px', '15px', '20px', '25px'] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'color': ["Black", "White", "Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Gray", "Brown", "Cyan", "Pink", "Magenta", "Lime", "Teal"] }]
+                  ]
+                }}
+                value={general}
+                onChange={(e) => { SetGeneral(e) }}
+              />
+
+
+            </div>
+            <div className='col-12 text-center mt-5 mb-2'>
+              <span className='btn btn-primary text-center col-6 col-md-4 col-lg-3' onClick={() => {
+                handleSave()
+                HandleSave()
+              }} >Update</span>
+            </div>
+          </form>
+        </div>}
+      </div>
+
+      <div className='d-none d-md-block'>
+        <Dsidebar />
+      </div>
+      {Show && <>
+        <div style={{ position: 'absolute', top: '0px', width: '100%', overflow: 'hidden' }}>
+          <Sidebar2 ShowSide2={ShowSide2} />
+        </div>
+      </>}
+      <>
+      </>
+      {Pop && <>
+        <div style={{ overflow: 'hidden', position: 'absolute', top: '120px', right: '10px', backgroundColor: 'yellow' }} className=' p-2 col-10 col-md-6 col-lg-5 col-xl-4'>
+          <div style={{ borderRadius: '50px' }}>
+            <span className='text-danger h6'>Warning</span>
+            <i onClick={() => { setPop(!Pop) }} style={{ position: 'absolute', top: '5px', right: '15px', fontSize: '25px', borderRadius: '50px' }} className="fa-solid fa-xmark text-danger bg-danger text-dark p-1 btn"></i>
+          </div>
+          <div className='mt-4 p-3' >
+            <span className='text-ligh h6' style={{ fontSize: '20px' }}>You cannot delete the product if it has not been delivered to the customer. The customer has ordered the product, but it has not yet been delivered.</span>
+          </div>
+        </div>
+      </>}
+      {Bottom && <>
+        <div className='col-7 col-sm-5 col-md-4 col-lg-3 bg-white' style={{ position: 'absolute', top: '50px', right: '30px' }} >
+          <div className='d-flex flex-row justify-content-end' onClick={() => { setBottom(!Bottom) }}>
+            <i class="fa-regular fa-circle-xmark p-2 text-danger h5 " ></i>
+
+          </div>
+          <div className='d-flex flex-row justify-content-center p-1' onClick={() => {
+            setBottom(false)
+            setPro1(true)
+          }}>
+            <i class="fa-solid fa-user mr-3 mt-auto mb-auto"></i><span span style={{ fontSize: '20px', cursor: 'pointer' }}>Profile</span>
+          </div>
+          <div className='d-flex flex-row justify-content-center p-1 mb-2 '>
+            <i class="fa-solid fa-power-off mr-3 mt-auto mb-auto"></i><span style={{ fontSize: '20px', cursor: 'pointer' }}>Logout</span>
+          </div>
+        </div>
+      </>}
+      {Pro1 && <>
+        <div className='col-11 col-sm-7 col-md-5 col-lg-4 col-xl-3' style={{ position: 'absolute', right: '10px', top: '0px' }}>
+          <Profile ProF={ProF} />
+        </div>
+      </>}
+      <div className=' col-12  ' style={{ overflow: 'hidden', position: 'absolute', top: '100px' }} >
+        <div className='d-flex flex-row  p-2  mt-1' style={{ backgroundColor: 'white', background: 'rgb(0,0,0,0)' }}>
+          <div className='mod  col-md-4 col-lg-3 d-none d-md-block ml-auto' style={{ visibility: 'hidden' }}>
+
+            <h6 className='mt-2'>Filter By You'r Product by Product_Name </h6>
+
+          </div>
+          <div className='col-12 col-md-8 p-1 ml-auto' style={{ visibility: `${Sug.length == 0 ? 'hidden' : ''}`, }}>
+            <div className='col-12 card d-flex flex-comun' style={{ height: `${Sug.length > 10 ? '250px' : ''}`, overflow: `${Sug.length > 10 ? 'auto' : ''}` }}  >
+
+              {Sug && Sug.map((e) => {
+                return <small style={{ cursor: 'pointer' }} onClick={() => {
+                  HandleNaviProduct(e)
+                }}>{e.split(" ").slice(0, 8).join(' ')}</small>
+              })}
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {ShowFilter&&<>
+        <div className=' d-block  d-sm-none    bg-info p-2 col-10' style={{ overflowY: 'auto', overflowX: 'hidden',position:'absolute',top:'120px',left:'10px' }}>
+          <div className='d-flex flex-row justify-content-end mt-2'>
+          <span className='ml-auto btn btn-danger' onClick={()=>{SetShowFilter(false)}}>Close</span>
+          </div>
+          <div className='d-flex flex-column text-white'>
+            <span className='btn text-white btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'All'
+              handleCatgerory(type)
+            }}>All</span>
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Electronic'
               handleCatgerory(type)
             }}>Electronics</span>
@@ -263,115 +1081,48 @@ const Modify = () => {
               const type = 'Clothing'
               handleCatgerory(type)
             }}>Clothing</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Footware'
               handleCatgerory(type)
             }}>Footware</span>
-            <span className='btn text-white  btn1 ' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1 ' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Accessories'
               handleCatgerory(type)
             }}>Accessories</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Beauty&Person'
               handleCatgerory(type)
             }}>Beauty&Person</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Home&Kichen'
               handleCatgerory(type)
             }}>Home&Kichen</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span onMouseEnter={() => { HandleCategoryHover2("Furniture") }} className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Furniture'
               handleCatgerory(type)
             }}>Furniture</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Book,Movies&Music'
               handleCatgerory(type)
             }}>Books,Movies&Musics</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Sports'
               handleCatgerory(type)
             }}>Sports</span>
-            <span className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
+            <span  className='btn text-white  btn1' style={{ textAlign: 'start' }} onClick={() => {
               const type = 'Health'
               handleCatgerory(type)
             }}>Health</span>
-            <span className='btn text-white btn1' style={{ textAlign: 'start' }} onClick={() => {
-              const type = 'Toys&Games '
+            <span  className='btn text-white btn1' style={{ textAlign: 'start' }} onClick={() => {
+              const type = 'Toys&Games'
               handleCatgerory(type)
             }}>Toys&Games</span>
           </div>
         </div>
-        <div className=' col-sm-7 col-md-10 col-lg-10 row vh-100 ' style={{ overflowY: 'auto', overflowX: 'hidden', }}>
-          {products && products.map((e, index) => {
-            return (
-              <div className='col-sm-12 col-md-6 col-md- d-sm-flex flex-sm-column d-flex-row mt-3' key={index}>
-                <div className='row'>
-                  <div className='col-12 text-center'>
-                    {index === editedIndex ?
-                      <>
-                        <input type='file' onChange={handleImageChange} capture />
-                      </> : <img src={e.ImageUrl} alt="" height={'130px'} />}
+      </>}
 
-                  </div>
-                  <div className='col-12 text-center'>
-                    {index === editedIndex ? (
-                      <>
-                        <input style={{ fontSize: '25px', fontWeight: 'bold', color: 'red' }} value={editedProductName} className='form-control' onChange={(e) => setEditedProductName(e.target.value)} />
-                        <input style={{ fontSize: '25px', fontWeight: 'bold', }} value={editedPrice} className='form-control' onChange={(e) => setEditedPrice(e.target.value)} />
-                        <input style={{ fontSize: '25px', fontWeight: 'bold', }} value={editStack} className='form-control' onChange={(e) => { setEditedStack(e.target.value) }} />
-                        <input style={{ fontSize: '25px', fontWeight: 'bold', }} value={editDiscount} className='form-control' onChange={(e) => { setEditedDiscount(e.target.value) }} />
-                      </>
-                    ) : (
-                      <>
-                        <h6 className=''>{e.Product_Name.Product_Name}</h6>
-                        <h6><i className="fa-solid fa-indian-rupee-sign"></i>{e.Product_Name.Price}</h6>
-                        <h6>Stack-:<span className='text-info' style={{ fontWeight: 'bold' }}>{e.Product_Name.Stack}</span></h6>
-                        <h5>Discount-:<span className='text-danger'>{e.Product_Name.Discount}%</span></h5>
-                      </>
-                    )}
-                  </div>
-                  <div className='col-12 text-center'>
-                    {index === editedIndex ? (
-                      <button className='btn btn-success' onClick={() => handleSave(index, e)}>Save</button>
-                    ) : (
-                      <>
-                        <button className='btn btn-primary ml-3 mr-3' onClick={() => handleEdit(index, e.Product_Name.Product_Name, e.Product_Name.Price, e.Product_Name.Stack, e.Product_Name.Discount)}>
-                          <i className="fa-solid fa-pen-to-square mr-3"></i>Edit
-                        </button>
-                        <button className='btn btn-danger' onClick={() => { HandleDelete(e) }}><i className="fa-solid fa-trash mr-2"></i>Delete</button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        {Con1&&<>
-      <div className='col-sm-5   card bg-primary' style={{position:'absolute',top:'105px',right:'10px',overflow:'hidden'}}>
-          <h6 className='text-center mt-2'>Password Change</h6>
-          <form onSubmit={HandlePassword}>
-             <input type="password" onChange={(e)=>{setpw(e.target.value)}} placeholder='Enter New Password' className='form-control ml-2 mr-2 p-2 mb-2 mt-3' />
-             <input type="password" onChange={(e)=>{setrpw(e.target.value)}} placeholder='Enter  AgainNew Password' className='form-control ml-2 mr-2 mb-2' />
-            <div className='text-center mb-2'>
-               <input type="submit" value={'Change Password'} className='btn btn-warning ' />
-            </div>
-          </form>
-      </div>
-     </>}
-     {Con2&&<>
-      <div className='col-sm-5   card bg-primary' style={{position:'absolute',top:'105px',right:'10px',overflow:'hidden'}}>
-          <h6 className='text-center mt-2'>Username Change</h6>
-          <form onSubmit={HandleUsername}>
-             <input type="password" onChange={(e)=>{setun(e.target.value)}} placeholder='Enter New Username' className='form-control ml-2 mr-2 p-2 mb-2 mt-3' />
-             <input type="password" onChange={(e)=>{setrun(e.target.value)}} placeholder='Enter  AgainNew Username' className='form-control ml-2 mr-2 mb-2' />
-            <div className='text-center mb-2'>
-               <input type="submit" value={'Change Username'} className='btn btn-warning ' />
-            </div>
-          </form>
-      </div>
-     </>}
-      </div>
+
+
     </>
   )
 }
